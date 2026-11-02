@@ -35,6 +35,18 @@ npm run test:e2e                     # Playwright suite (client/e2e)
 ```
 Env: copy `server/.env.example` → `server/.env`, `client/.env.example` → `client/.env.local`.
 
+## Deployment
+- **Client → Vercel** (https://mofaya-platform.vercel.app, root directory `client`): `client/.env.production` points
+  `NEXT_PUBLIC_API_URL` at Render; a Vercel env var of the same name overrides it.
+- **Server → Render** (https://mofaya-platform.onrender.com, web service):
+  - Build: `npm install` — Start: `npm start -w server` (`prestart` compiles TypeScript, so `dist/` always exists;
+    `typescript` and `@types/*` are regular dependencies so this works even when devDependencies are skipped).
+  - Env: `NODE_ENV=production`, `NEXT_PUBLIC_URL=https://mofaya-platform.vercel.app`, `VERCEL_PROJECT_NAME=mofaya-platform`,
+    `JWT_SECRET`, `DATABASE_URL` (Neon, `?sslmode=require`), `GOOGLE_FORM_*`. Render supplies `PORT`.
+  - `.env` is loaded in code (`process.loadEnvFile` in `server/src/config.ts`), never via `node --env-file*` flags —
+    `--env-file-if-exists` crashes Node < 22.9.
+- **Secrets** (`JWT_SECRET`, `DATABASE_URL`) go only in `server/.env` (gitignored) or the Render dashboard — never `.env.example`.
+
 ## Hard Rules
 - **Assets:** only official `mofaya.co.za` URLs, declared once in `client/src/lib/mofayaData.ts`. No stock or placeholders. `CanImage` draws a CSS can in the flavour colours if a remote image fails — never a substitute photo.
 - **Tokens:** `obsidian #0A0A0C`, `flame #FF3E00`, `ember #E60000`, `gold #C9A13B`, `ash #DCDCDC` in `client/tailwind.config.ts`. Use tokens, not raw hex, in components (flavour gradients excepted — they live in `mofayaData.ts`).

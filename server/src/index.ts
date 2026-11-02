@@ -1,11 +1,21 @@
 import express from "express";
 import cors from "cors";
+import { config, isAllowedOrigin, reportMissingConfig } from "./config.js";
 import { recruitmentRouter } from "./routes/recruitment.js";
 
-const app = express();
-const PORT = Number(process.env.PORT ?? 4000);
+reportMissingConfig();
 
-app.use(cors({ origin: process.env.CLIENT_ORIGIN ?? "http://localhost:3000" }));
+const app = express();
+
+// Render terminates TLS at its proxy; trust it so req.ip / req.protocol are the client's.
+app.set("trust proxy", 1);
+
+app.use(
+  cors({
+    // No Origin header = server-to-server or health checks; allow those.
+    origin: (origin, callback) => callback(null, !origin || isAllowedOrigin(origin)),
+  }),
+);
 app.use(express.json({ limit: "20kb" }));
 
 app.get("/api/health", (_req, res) => {
@@ -14,6 +24,7 @@ app.get("/api/health", (_req, res) => {
 
 app.use("/api/recruitment", recruitmentRouter);
 
-app.listen(PORT, () => {
-  console.log(`MoFaya server listening on http://localhost:${PORT}`);
+app.listen(config.port, () => {
+  console.log(`MoFaya server listening on port ${config.port}`);
+  console.log(`[config] Allowed origins: ${config.allowedOrigins.join(", ")}`);
 });
