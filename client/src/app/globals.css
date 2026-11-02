@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+/* No global `scroll-behavior: smooth`: it fights ScrollTrigger's snap scrolling.
+   Anchor links smooth-scroll in JS instead (see smoothScrollTo in HeroSection). */
+body {
+  @apply bg-obsidian font-sans text-white antialiased;
+  /* clip (not hidden) so decorative glows can't cause sideways scroll without breaking pinning. */
+  overflow-x: clip;
+}
+
+::selection {
+  @apply bg-flame text-white;
+}
+
+@layer components {
+  .glass {
+    @apply border border-white/10 bg-white/[0.04] backdrop-blur-md;
+  }
+
+  /* Heavy caps headline, as on mofaya.co.za. */
+  .display-xl {
+    @apply font-display font-black uppercase leading-[0.95] tracking-[-0.02em];
+  }
+
+  /* Brush-script accent word ("FIND YOUR FAYA"). Slight lift so it sits on the caps baseline. */
+  .brush {
+    @apply inline-block -rotate-3 font-normal normal-case tracking-normal text-gold;
+    font-family: var(--font-marker), cursive;
+  }
+
+  /* Dark brushstroke chevrons from the official About page wallpaper. `lighten` drops its black
+     backdrop so only the strokes show over obsidian. */
+  .brush-wallpaper {
+    background-image: url("https://mofaya.co.za/wp-content/uploads/2023/12/About-Us-Wallpaper.png");
+    background-size: cover;
+    background-position: right bottom;
+    mix-blend-mode: lighten;
+  }
+
+  /* Strip of MoFaya's geometric pattern (bottom, dark half of the official artwork). */
+  .pattern-strip {
+    height: clamp(3.5rem, 7vw, 6.5rem);
+    background-image: url("https://mofaya.co.za/wp-content/uploads/2023/12/Flame-Pattern-1.png");
+    background-size: auto 200%;
+    background-position: left bottom;
+    background-repeat: repeat-x;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center px-8 py-4 text-sm font-extrabold uppercase tracking-[0.08em] transition
+      focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cream;
+  }
+
+  .btn-flame {
+    @apply btn bg-gradient-to-r from-ember to-flame text-white shadow-[0_10px_40px_-12px_rgba(255,62,0,0.9)]
+      hover:-translate-y-0.5 hover:shadow-[0_14px_50px_-10px_rgba(255,62,0,1)];
+  }
+
+  .btn-outline {
+    @apply btn border-2 border-white text-white hover:bg-white hover:text-obsidian;
+  }
+
+  .field {
+    @apply w-full border border-white/20 bg-white/[0.05] px-4 py-3 text-white outline-none transition
+      placeholder:text-white/30 focus:border-flame focus:ring-2 focus:ring-flame/30
+      aria-[invalid=true]:border-red-500/70;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float,
+  .animate-burn {
+    animation: none;
+  }
+}
